@@ -58,8 +58,8 @@ async def prometheus_middleware(request: Request, call_next):
         endpoint=request.url.path,
         status=response.status_code,
         duration=duration,
-        request_size=request_size,
-        response_size=int(response_size) if response_size else 0
+        request_size_bytes=request_size,
+        response_size_bytes=int(response_size) if response_size else 0
     )
     
     # Add latency to response headers

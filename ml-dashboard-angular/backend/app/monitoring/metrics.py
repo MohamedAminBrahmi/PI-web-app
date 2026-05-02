@@ -173,12 +173,12 @@ class MetricsCollector:
         self.error_count = 0
         self.predictions_cache = []
         
-    def record_request(self, method: str, endpoint: str, status: int, duration: float, request_size: int, response_size: int):
+    def record_request(self, method: str, endpoint: str, status: int, duration: float, request_size_bytes: int, response_size_bytes: int):
         """Record API request metrics."""
         request_count.labels(method=method, endpoint=endpoint, status=status).inc()
         request_duration.labels(method=method, endpoint=endpoint).observe(duration)
-        request_size.labels(method=method, endpoint=endpoint).observe(request_size)
-        response_size.labels(method=method, endpoint=endpoint).observe(response_size)
+        request_size.labels(method=method, endpoint=endpoint).observe(request_size_bytes)
+        response_size.labels(method=method, endpoint=endpoint).observe(response_size_bytes)
         self.request_count += 1
         
     def record_prediction(self, model_type: str, latency: float, confidence: float, status: str = "success"):

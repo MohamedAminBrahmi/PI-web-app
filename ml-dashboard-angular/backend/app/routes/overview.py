@@ -8,12 +8,12 @@ loader = ModelsLoader()
 
 
 @router.get("/health")
-async def health_check() -> Dict[str, str]:
+async def health_check() -> Dict[str, Any]:
     """Health check endpoint."""
     try:
         if not loader.is_loaded():
             raise HTTPException(status_code=503, detail="Models not loaded")
-        return {"status": "healthy", "models_loaded": len(loader.models)}
+        return {"status": "healthy", "models_loaded": str(len(loader.models))}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
