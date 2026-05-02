@@ -1,0 +1,90 @@
+<div class="classification-container">
+  <h1>🎯 Classification Models</h1>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading classification models...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <p>❌ {{ error }}</p>
+  </div>
+
+  <div *ngIf="classificationModels && !loading" class="section">
+    <div class="model-selector">
+      <label for="model-select">Select Model:</label>
+      <select [(ngModel)]="selectedModel" (change)="onModelChange()" id="model-select">
+        <option *ngFor="let model of classificationModels | keyvalue" [value]="model.key">
+          {{ model.key }}
+        </option>
+      </select>
+    </div>
+
+    <div class="model-metrics">
+      <h2>Model Performance Metrics</h2>
+      <div class="metrics-grid">
+        <div class="metric">
+          <span class="label">F1 Score</span>
+          <span class="value">{{ (classificationModels[selectedModel]?.f1 || 0).toFixed(4) }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">Accuracy</span>
+          <span class="value">{{ (classificationModels[selectedModel]?.accuracy || 0).toFixed(4) }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">Precision</span>
+          <span class="value">{{ (classificationModels[selectedModel]?.precision || 0).toFixed(4) }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">Recall</span>
+          <span class="value">{{ (classificationModels[selectedModel]?.recall || 0).toFixed(4) }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">AUC</span>
+          <span class="value">{{ (classificationModels[selectedModel]?.auc || 0).toFixed(4) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="details" *ngIf="confusionMatrix">
+      <h2>Confusion Matrix</h2>
+      <div class="matrix-table">
+        <table>
+          <tbody>
+            <tr *ngFor="let row of confusionMatrix.confusion_matrix">
+              <td *ngFor="let cell of row" class="matrix-cell">{{ cell }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="details" *ngIf="classificationReport">
+      <h2>Classification Report</h2>
+      <div class="report-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Precision</th>
+              <th>Recall</th>
+              <th>F1-Score</th>
+              <th>Support</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let key of classificationReport.report | keyvalue">
+              <td *ngIf="shouldShowRow(key.key)">
+                {{ key.key }}
+              </td>
+              <td *ngFor="let metric of getMetricsAsArray(key.value)" class="metric-cell">
+                {{ isNumber(metric.value) ? (metric.value | number: '1.2-4') : metric.value }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <button (click)="loadClassificationModels()" class="refresh-btn">🔄 Refresh</button>
+</div>

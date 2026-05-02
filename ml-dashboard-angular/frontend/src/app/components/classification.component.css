@@ -1,0 +1,153 @@
+.classification-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+
+h2 {
+  color: #444;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  color: #666;
+}
+
+.error-message {
+  padding: 15px;
+  background: #fee;
+  color: #c33;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.section {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.model-selector {
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.model-selector label {
+  font-weight: 600;
+  color: #333;
+}
+
+.model-selector select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.model-metrics {
+  margin-bottom: 30px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.metric {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.metric .label {
+  display: block;
+  font-size: 12px;
+  opacity: 0.8;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.metric .value {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.details {
+  margin-bottom: 30px;
+}
+
+.matrix-table {
+  overflow-x: auto;
+}
+
+.matrix-table table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.matrix-cell {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.report-table {
+  overflow-x: auto;
+}
+
+.report-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.report-table th,
+.report-table td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.report-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.metric-cell {
+  text-align: center;
+}
+
+.refresh-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 20px;
+}
+
+.refresh-btn:hover {
+  background: #764ba2;
+}

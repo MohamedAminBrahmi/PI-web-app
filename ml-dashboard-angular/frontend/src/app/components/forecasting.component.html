@@ -1,0 +1,84 @@
+<div class="forecasting-container">
+  <h1>🕐 Time Series Forecasting</h1>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading forecasting models...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <p>❌ {{ error }}</p>
+  </div>
+
+  <div *ngIf="forecastingModels && !loading" class="section">
+    <div class="model-selector">
+      <label for="model-select">Select Model:</label>
+      <select [(ngModel)]="selectedModel" (change)="onModelChange()" id="model-select">
+        <option *ngFor="let model of forecastingModels | keyvalue" [value]="model.key">
+          {{ model.key }}
+        </option>
+      </select>
+    </div>
+
+    <div class="model-metrics">
+      <h2>Model Performance</h2>
+      <div class="metrics-grid">
+        <div class="metric">
+          <span class="label">RMSE</span>
+          <span class="value">{{ (forecastingModels[selectedModel]?.rmse || 0).toFixed(4) }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">MAE</span>
+          <span class="value">{{ (forecastingModels[selectedModel]?.mae || 0).toFixed(4) }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">MAPE (%)</span>
+          <span class="value">{{ (forecastingModels[selectedModel]?.mape || 0).toFixed(2) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="details" *ngIf="timeSeriesData">
+      <h2>Time Series Data Summary</h2>
+      <div class="ts-summary">
+        <div class="summary-item">
+          <span class="label">Training Samples</span>
+          <span class="value">{{ timeSeriesData.train_size }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Test Samples</span>
+          <span class="value">{{ timeSeriesData.test_size }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="details" *ngIf="forecastData">
+      <h2>Forecast Results (First 30 points)</h2>
+      <div class="forecast-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Time Step</th>
+              <th>Actual</th>
+              <th>Predicted</th>
+              <th>Error</th>
+              <th>% Error</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let i of forecastData.actual.slice(0, 30); let idx = index">
+              <td>{{ idx + 1 }}</td>
+              <td>{{ forecastData.actual[idx].toFixed(2) }}</td>
+              <td>{{ forecastData.predicted[idx].toFixed(2) }}</td>
+              <td>{{ (forecastData.actual[idx] - forecastData.predicted[idx]).toFixed(2) }}</td>
+              <td>
+                {{ ((Math.abs(forecastData.actual[idx] - forecastData.predicted[idx]) / Math.max(1, forecastData.actual[idx])) * 100).toFixed(2) }}%
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <button (click)="loadForecastingModels()" class="refresh-btn">🔄 Refresh</button>
+</div>

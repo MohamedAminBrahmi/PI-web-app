@@ -1,0 +1,62 @@
+<div class="clustering-container">
+  <h1>🔵 Clustering Analysis</h1>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading clustering data...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <p>❌ {{ error }}</p>
+  </div>
+
+  <div *ngIf="silhouetteAnalysis && !loading" class="silhouette-section">
+    <h2>Silhouette Analysis</h2>
+    <div class="silhouette-stats">
+      <div class="stat-card">
+        <div class="stat-label">Best K</div>
+        <div class="stat-value">{{ silhouetteAnalysis.best_k }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Best Score</div>
+        <div class="stat-value">{{ silhouetteAnalysis.best_score.toFixed(4) }}</div>
+      </div>
+    </div>
+    
+    <div class="scores-grid">
+      <div *ngFor="let item of silhouetteAnalysis.silhouette_scores | keyvalue" class="score-item">
+        <span class="k-value">K={{ item.key }}</span>
+        <div class="score-bar">
+          <div class="score-fill" [style.width.%]="getScoreWidth(item.value)"></div>
+        </div>
+        <span class="score-value">{{ getScoreValue(item.value) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="clustersSummary && !loading" class="clusters-section">
+    <h2>Clusters Summary</h2>
+    <div class="clusters-grid">
+      <div *ngFor="let item of clustersSummary.clusters | keyvalue" class="cluster-card">
+        <div class="cluster-header">{{ item.key }}</div>
+        <div class="cluster-details">
+          <p><strong>Size:</strong> {{ getClusterSize(item.value) }} units</p>
+          <p><strong>Avg Events:</strong> {{ getClusterAvgEvents(item.value) }}</p>
+          <p><strong>Avg Participants:</strong> {{ getClusterAvgParticipants(item.value) }}</p>
+          <p *ngIf="getClusterUnits(item.value)" class="units-list"><strong>Units:</strong> {{ getClusterUnits(item.value) }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="pcaVisualization && !loading" class="pca-section">
+    <h2>PCA Visualization Data</h2>
+    <p class="info">PCA coordinates (2D projection) loaded. Use a charting library to visualize:</p>
+    <div class="pca-info">
+      <p><strong>Data Points:</strong> {{ pcaVisualization.pca.x.length }}</p>
+      <p><strong>Clusters:</strong> {{ pcaVisualization.clusters.length }}</p>
+      <p><strong>Features:</strong> {{ pcaVisualization.features.join(', ') }}</p>
+    </div>
+  </div>
+
+  <button (click)="loadClusteringData()" class="refresh-btn">🔄 Refresh</button>
+</div>

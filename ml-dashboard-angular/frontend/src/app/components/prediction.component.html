@@ -1,0 +1,117 @@
+<div class="prediction-container">
+  <div class="prediction-header">
+    <h1>🔮 Model Prediction</h1>
+    <p>Test your trained models with custom inputs</p>
+  </div>
+
+  <div class="prediction-card">
+    <!-- Model Selection -->
+    <div class="form-section">
+      <h2>1. Select Model</h2>
+      
+      <div class="form-group">
+        <label>Model Type:</label>
+        <select [(ngModel)]="selectedModelType" (change)="onModelTypeChange()" class="form-control">
+          <option value="classification">Classification</option>
+          <option value="regression">Regression</option>
+          <option value="clustering">Clustering</option>
+          <option value="forecasting">Forecasting</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Select Model:</label>
+        <select [(ngModel)]="selectedModel" class="form-control">
+          <option *ngFor="let model of getModelList()" [value]="model">
+            {{ model }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Feature Input -->
+    <div class="form-section">
+      <h2>2. Input Features</h2>
+      
+      <div class="features-grid">
+        <div class="feature-input" *ngFor="let key of featureKeys; let i = index">
+          <label>{{ featureLabels[i] }}:</label>
+          <input 
+            type="number" 
+            [(ngModel)]="features[key]" 
+            class="form-control"
+            [step]="i === 4 ? '1' : '0.1'"
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-section">
+      <div class="button-group">
+        <button 
+          (click)="makePrediction()" 
+          [disabled]="loading" 
+          class="btn btn-primary"
+        >
+          <span *ngIf="!loading">🚀 Make Prediction</span>
+          <span *ngIf="loading">⏳ Processing...</span>
+        </button>
+        <button (click)="resetForm()" class="btn btn-secondary">
+          🔄 Reset Form
+        </button>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="alert alert-error">
+      ⚠️ {{ error }}
+    </div>
+
+    <!-- Prediction Result -->
+    <div *ngIf="prediction" class="result-section">
+      <h2>Prediction Result</h2>
+      
+      <div class="result-card">
+        <div class="result-item">
+          <label>Model:</label>
+          <span class="value">{{ prediction.model_name }}</span>
+        </div>
+        
+        <div class="result-item">
+          <label>Type:</label>
+          <span class="value">{{ prediction.model_type | titlecase }}</span>
+        </div>
+        
+        <div class="result-item">
+          <label>Prediction:</label>
+          <span class="value prediction-value">
+            {{ prediction.prediction }}
+          </span>
+        </div>
+        
+        <div *ngIf="prediction.confidence" class="result-item">
+          <label>Confidence:</label>
+          <div class="confidence-bar">
+            <div 
+              class="confidence-fill" 
+              [style.width.%]="prediction.confidence * 100"
+            ></div>
+            <span class="confidence-text">{{ (prediction.confidence * 100).toFixed(2) }}%</span>
+          </div>
+        </div>
+        
+        <div *ngIf="prediction.model_info" class="result-item">
+          <label>Model Info:</label>
+          <div class="model-info">
+            <span *ngFor="let key of ['accuracy', 'f1', 'rmse', 'r2', 'n_clusters'] | keyvalue">
+              <span *ngIf="prediction.model_info[key.key] !== undefined">
+                <strong>{{ key.key }}:</strong> {{ prediction.model_info[key.key] | number: '1.4-4' }}<br>
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

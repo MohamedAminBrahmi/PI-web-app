@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: ml-dashboard-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend/models:/app/models
+      - ./backend/data:/app/data
+      - ./backend/mlruns:/app/mlruns
+    networks:
+      - ml-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys, urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/overview/health'); sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: ml-dashboard-frontend
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
+    networks:
+      - ml-network
+    environment:
+      - API_URL=http://backend:8000/api/v1
+
+  mlflow:
+    image: python:3.11-slim
+    container_name: ml-dashboard-mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend/mlruns:/mlruns
+      - ./backend:/app
+    working_dir: /app
+    command: bash -c "pip install mlflow && mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri file:/mlruns"
+    networks:
+      - ml-network
+    environment:
+      - PYTHONUNBUFFERED=1
+
+networks:
+  ml-network:
+    driver: bridge
+
+volumes:
+  models:
+  data:
+  mlruns:

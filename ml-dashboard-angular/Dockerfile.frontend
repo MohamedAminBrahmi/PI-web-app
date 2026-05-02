@@ -1,0 +1,34 @@
+# Frontend Dockerfile
+FROM node:18-alpine as builder
+
+WORKDIR /app
+
+# Copy package files
+COPY frontend/package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy application code
+COPY frontend .
+
+# Build Angular app
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine
+
+# Install live-server for development or nginx for production
+# For development, we'll use a simple HTTP server
+RUN npm install -g http-server
+
+WORKDIR /app
+
+# Copy built app from builder
+COPY --from=builder /app/dist/ml-dashboard ./dist
+
+# Expose port
+EXPOSE 4200
+
+# Serve Angular app
+CMD ["http-server", "dist", "-p", "4200", "--cors"]

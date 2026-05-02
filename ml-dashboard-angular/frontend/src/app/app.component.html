@@ -1,0 +1,26 @@
+<div class="app-wrapper">
+  <header class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-brand">
+        <h1>📊 ML Dashboard</h1>
+      </div>
+      <nav class="nav-menu" [class.open]="menuOpen">
+        <a class="nav-item" [class.active]="isActive('/overview')" (click)="navigate('/overview')">Overview</a>
+        <a class="nav-item" [class.active]="isActive('/classification')" (click)="navigate('/classification')">Classification</a>
+        <a class="nav-item" [class.active]="isActive('/regression')" (click)="navigate('/regression')">Regression</a>
+        <a class="nav-item" [class.active]="isActive('/clustering')" (click)="navigate('/clustering')">Clustering</a>
+        <a class="nav-item" [class.active]="isActive('/forecasting')" (click)="navigate('/forecasting')">Forecasting</a>
+        <a class="nav-item" [class.active]="isActive('/prediction')" (click)="navigate('/prediction')">🔮 Predict</a>
+      </nav>
+      <button class="menu-toggle" (click)="toggleMenu()">☰</button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2024 ML Dashboard | Powered by Angular & FastAPI</p>
+  </footer>
+</div>

@@ -1,0 +1,21 @@
+# Backend Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY backend/app ./app
+COPY backend/train.py .
+
+# Create directories for models, data, and mlruns
+RUN mkdir -p models data mlruns
+
+# Expose port
+EXPOSE 8000
+
+# Run FastAPI app
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

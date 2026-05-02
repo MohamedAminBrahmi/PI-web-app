@@ -1,0 +1,88 @@
+<div class="regression-container">
+  <h1>📈 Regression Models</h1>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading regression models...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <p>❌ {{ error }}</p>
+  </div>
+
+  <div *ngIf="regressionModels && !loading" class="section">
+    <div class="model-selector">
+      <label for="model-select">Select Model:</label>
+      <select [(ngModel)]="selectedModel" (change)="onModelChange()" id="model-select">
+        <option *ngFor="let model of regressionModels | keyvalue" [value]="model.key">
+          {{ model.key }}
+        </option>
+      </select>
+    </div>
+
+    <div class="model-metrics">
+      <h2>Model Performance</h2>
+      <div class="metrics-grid">
+        <div class="metric">
+          <span class="label">R² Score</span>
+          <span class="value">{{ (regressionModels[selectedModel]?.r2 || 0).toFixed(4) }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">RMSE</span>
+          <span class="value">{{ (regressionModels[selectedModel]?.rmse || 0).toFixed(4) }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">MAE</span>
+          <span class="value">{{ (regressionModels[selectedModel]?.mae || 0).toFixed(4) }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">MSE</span>
+          <span class="value">{{ (regressionModels[selectedModel]?.mse || 0).toFixed(4) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="details" *ngIf="regressionData">
+      <h2>Actual vs Predicted (First 20 samples)</h2>
+      <div class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Sample</th>
+              <th>Actual</th>
+              <th>Predicted</th>
+              <th>Error</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let i of regressionData.actual.slice(0, 20); let idx = index">
+              <td>{{ idx + 1 }}</td>
+              <td>{{ regressionData.actual[idx].toFixed(2) }}</td>
+              <td>{{ regressionData.predicted[idx].toFixed(2) }}</td>
+              <td>{{ (regressionData.actual[idx] - regressionData.predicted[idx]).toFixed(2) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="details" *ngIf="residuals">
+      <h2>Residuals Analysis</h2>
+      <div class="residual-stats">
+        <div class="stat">
+          <span class="label">Mean Residual</span>
+          <span class="value">{{ residuals.mean.toFixed(4) }}</span>
+        </div>
+        <div class="stat">
+          <span class="label">Std Residual</span>
+          <span class="value">{{ residuals.std.toFixed(4) }}</span>
+        </div>
+        <div class="stat">
+          <span class="label">Total Samples</span>
+          <span class="value">{{ residuals.count }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button (click)="loadRegressionModels()" class="refresh-btn">🔄 Refresh</button>
+</div>
