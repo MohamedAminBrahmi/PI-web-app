@@ -1,0 +1,117 @@
+groups:
+  - name: ml_dashboard_alerts
+    interval: 30s
+    rules:
+      # API Performance Alerts
+      - alert: HighAPILatency
+        expr: histogram_quantile(0.95, rate(ml_api_request_duration_seconds_bucket[5m])) > 1.0
+        for: 2m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High API latency detected"
+          description: "95th percentile API latency is {{ $value }}s (threshold: 1.0s)"
+
+      - alert: HighErrorRate
+        expr: (rate(ml_api_requests_total{status=~"5.."}[5m]) / rate(ml_api_requests_total[5m])) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "High API error rate"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+
+      - alert: APIDown
+        expr: up{job="ml-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "ML API is down"
+          description: "ML API has been down for more than 1 minute"
+
+      # Model Performance Alerts
+      - alert: AccuracyDegradation
+        expr: ml_accuracy_drop_alerts_total > 0
+        for: 5m
+        labels:
+          severity: warning
+          component: model
+        annotations:
+          summary: "Model accuracy degradation detected"
+          description: "Model accuracy has dropped more than 5% from baseline"
+
+      - alert: ConfidenceDegradation
+        expr: ml_confidence_drop_alerts_total > 0
+        for: 5m
+        labels:
+          severity: warning
+          component: model
+        annotations:
+          summary: "Model confidence degradation detected"
+          description: "Model confidence has dropped significantly"
+
+      # Data Quality Alerts
+      - alert: DataDriftDetected
+        expr: increase(ml_data_drift_detected_total[5m]) > 0
+        for: 2m
+        labels:
+          severity: warning
+          component: data
+        annotations:
+          summary: "Data drift detected"
+          description: "Feature distribution has shifted significantly"
+
+      - alert: ModelDriftDetected
+        expr: increase(ml_model_drift_detected_total[5m]) > 0
+        for: 2m
+        labels:
+          severity: warning
+          component: model
+        annotations:
+          summary: "Model drift detected"
+          description: "Model performance pattern has changed"
+
+      - alert: HighMissingValues
+        expr: ml_data_missing_values_percent > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: data
+        annotations:
+          summary: "High missing values in data"
+          description: "Missing values: {{ $value }}% (threshold: 10%)"
+
+      - alert: StaleData
+        expr: ml_data_freshness_hours > 24
+        for: 10m
+        labels:
+          severity: warning
+          component: data
+        annotations:
+          summary: "Data is stale"
+          description: "Data freshness: {{ $value }}h (threshold: 24h)"
+
+      # System Alerts
+      - alert: HighSystemErrors
+        expr: increase(ml_system_errors_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "High system error rate"
+          description: "{{ $value }} system errors in the last 5 minutes"
+
+      - alert: ManyActiveRequests
+        expr: ml_active_requests > 100
+        for: 2m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High number of active requests"
+          description: "{{ $value }} active requests (threshold: 100)"

@@ -9,3 +9,6 @@ joblib
 python-dotenv
 mlflow
 pyyaml
+prometheus-client
+py-healthcheck
+scipy

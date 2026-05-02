@@ -1,0 +1,198 @@
+{
+  "dashboard": {
+    "title": "ML Dashboard - Production Monitoring",
+    "tags": ["ml-dashboard", "monitoring", "production"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "API Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(ml_api_requests_total[1m])",
+            "legendFormat": "{{method}} {{endpoint}}"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}
+      },
+      {
+        "title": "API Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(ml_api_requests_total{status=~\"5..\"}[1m]) * 100",
+            "legendFormat": "Error Rate %"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}
+      },
+      {
+        "title": "API Latency (p50, p95, p99)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.5, rate(ml_api_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "p50"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(ml_api_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "p95"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(ml_api_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "p99"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}
+      },
+      {
+        "title": "Active Requests",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "ml_active_requests"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+        "thresholds": "0,50,100"
+      },
+      {
+        "title": "Model Accuracy vs Baseline",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "ml_model_accuracy",
+            "legendFormat": "{{model_type}}"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8}
+      },
+      {
+        "title": "Accuracy Deviation from Baseline (%)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "ml_accuracy_vs_baseline_percent",
+            "legendFormat": "{{model_type}}"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8}
+      },
+      {
+        "title": "Model Precision & Recall",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "ml_model_precision",
+            "legendFormat": "Precision - {{model_type}}"
+          },
+          {
+            "expr": "ml_model_recall",
+            "legendFormat": "Recall - {{model_type}}"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 24, "w": 12, "h": 8}
+      },
+      {
+        "title": "Prediction Confidence",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "ml_prediction_confidence",
+            "legendFormat": "{{model_type}}"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 24, "w": 12, "h": 8}
+      },
+      {
+        "title": "Data Drift Events",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "increase(ml_data_drift_detected_total[1h])",
+            "legendFormat": "{{feature}}"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 32, "w": 12, "h": 8}
+      },
+      {
+        "title": "Model Drift Events",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "increase(ml_model_drift_detected_total[1h])",
+            "legendFormat": "{{model_type}}"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 32, "w": 12, "h": 8}
+      },
+      {
+        "title": "Data Missing Values %",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "ml_data_missing_values_percent",
+            "legendFormat": "{{dataset}}"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 40, "w": 12, "h": 8},
+        "thresholds": "0,5,10"
+      },
+      {
+        "title": "Data Freshness (Hours)",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "ml_data_freshness_hours",
+            "legendFormat": "{{dataset}}"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 40, "w": 12, "h": 8},
+        "thresholds": "0,12,24"
+      },
+      {
+        "title": "System Errors",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "increase(ml_system_errors_total[1h])",
+            "format": "table",
+            "instant": true
+          }
+        ],
+        "gridPos": {"x": 0, "y": 48, "w": 12, "h": 8}
+      },
+      {
+        "title": "Accuracy Degradation Alerts",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "increase(ml_accuracy_drop_alerts_total[1h])",
+            "legendFormat": "{{model_type}}"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 48, "w": 12, "h": 8}
+      },
+      {
+        "title": "Latency vs Baseline",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "ml_latency_vs_baseline_percent"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 56, "w": 12, "h": 8}
+      },
+      {
+        "title": "Request Distribution by Endpoint",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum(rate(ml_api_requests_total[5m])) by (endpoint)"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 56, "w": 12, "h": 8}
+      }
+    ]
+  }
+}
