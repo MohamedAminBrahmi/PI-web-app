@@ -1,17 +1,26 @@
 <div class="app-wrapper">
   <header class="navbar">
     <div class="navbar-content">
-      <div class="navbar-brand">
-        <h1>📊 ML Dashboard</h1>
+      <div class="navbar-brand" (click)="navigate('/home')">
+        <div class="brand-badge">TSA</div>
+        <div class="brand-text">
+          <span class="brand-title">Tunisian Scout Association</span>
+          <span class="brand-subtitle">جمعية الكشاف التونسي</span>
+        </div>
       </div>
       <nav class="nav-menu" [class.open]="menuOpen">
+        <a class="nav-item" [class.active]="isActive('/home')" (click)="navigate('/home')">Home</a>
         <a class="nav-item" [class.active]="isActive('/overview')" (click)="navigate('/overview')">Overview</a>
-        <a class="nav-item" [class.active]="isActive('/classification')" (click)="navigate('/classification')">Classification</a>
-        <a class="nav-item" [class.active]="isActive('/regression')" (click)="navigate('/regression')">Regression</a>
-        <a class="nav-item" [class.active]="isActive('/clustering')" (click)="navigate('/clustering')">Clustering</a>
-        <a class="nav-item" [class.active]="isActive('/forecasting')" (click)="navigate('/forecasting')">Forecasting</a>
-        <a class="nav-item" [class.active]="isActive('/prediction')" (click)="navigate('/prediction')">🔮 Predict</a>
+        <a class="nav-item" [class.active]="isActive('/classification')" (click)="navigate('/classification')">Attendance</a>
+        <a class="nav-item" [class.active]="isActive('/regression')" (click)="navigate('/regression')">Estimates</a>
+        <a class="nav-item" [class.active]="isActive('/clustering')" (click)="navigate('/clustering')">Groups</a>
+        <a class="nav-item" [class.active]="isActive('/forecasting')" (click)="navigate('/forecasting')">Trends</a>
+        <a class="nav-item" [class.active]="isActive('/prediction')" (click)="navigate('/prediction')">Plan Activity</a>
       </nav>
+      <div class="navbar-actions">
+        <div id="google_translate_element" class="translate-widget"></div>
+        <button class="cta-btn" (click)="navigate('/prediction')">🏕️ Plan Activity</button>
+      </div>
       <button class="menu-toggle" (click)="toggleMenu()">☰</button>
     </div>
   </header>

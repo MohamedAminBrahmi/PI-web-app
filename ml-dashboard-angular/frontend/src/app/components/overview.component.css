@@ -5,30 +5,32 @@
 }
 
 h1 {
-  color: #333;
+  color: var(--olive-700);
   margin-bottom: 30px;
   font-size: 28px;
+  font-weight: 600;
 }
 
 h2 {
-  color: #444;
+  color: var(--olive-900);
   margin-top: 30px;
   margin-bottom: 20px;
   font-size: 20px;
+  font-weight: 600;
 }
 
 .loading {
   text-align: center;
   padding: 40px;
-  background: #f5f5f5;
+  background: var(--sand-50);
   border-radius: 8px;
   color: #666;
 }
 
 .error-message {
   padding: 15px;
-  background: #fee;
-  color: #c33;
+  background: #FDE7DE;
+  color: #B3392E;
   border-radius: 8px;
   margin-bottom: 20px;
 }
@@ -41,7 +43,7 @@ h2 {
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--olive-700) 0%, var(--olive-900) 100%);
   color: white;
   padding: 20px;
   border-radius: 8px;
@@ -71,7 +73,7 @@ h2 {
 
 .metric-card {
   background: white;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -80,7 +82,7 @@ h2 {
 .metric-title {
   font-weight: 600;
   margin-bottom: 12px;
-  color: #333;
+  color: var(--olive-900);
   font-size: 16px;
 }
 
@@ -91,7 +93,7 @@ h2 {
 }
 
 .refresh-btn {
-  background: #667eea;
+  background: var(--accent-500);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -102,5 +104,5 @@ h2 {
 }
 
 .refresh-btn:hover {
-  background: #764ba2;
+  background: var(--accent-600);
 }

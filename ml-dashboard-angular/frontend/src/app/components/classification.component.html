@@ -1,90 +1,121 @@
 <div class="classification-container">
-  <h1>🎯 Classification Models</h1>
+  <h1>🎯 Participation Insights</h1>
+  <p class="page-description">
+    Our system analyzes scout data to predict participation levels — helping you understand which scouts are likely to be 
+    <strong>highly active</strong>, <strong>moderately active</strong>, or <strong>less active</strong> in upcoming events.
+  </p>
 
   <div *ngIf="loading" class="loading">
-    <p>Loading classification models...</p>
+    <div class="loading-spinner"></div>
+    <p>Analyzing participation data...</p>
   </div>
 
   <div *ngIf="error" class="error-message">
     <p>❌ {{ error }}</p>
+    <button (click)="loadClassificationModels()" class="retry-btn">Try Again</button>
   </div>
 
-  <div *ngIf="classificationModels && !loading" class="section">
-    <div class="model-selector">
-      <label for="model-select">Select Model:</label>
-      <select [(ngModel)]="selectedModel" (change)="onModelChange()" id="model-select">
-        <option *ngFor="let model of classificationModels | keyvalue" [value]="model.key">
-          {{ model.key }}
-        </option>
-      </select>
+  <div *ngIf="bestModel && !loading && !error" class="content">
+
+    <!-- Main Accuracy Card -->
+    <div class="hero-card" [ngClass]="getAccuracyLevel(bestMetrics.accuracy)">
+      <div class="hero-icon">{{ getAccuracyEmoji(bestMetrics.accuracy) }}</div>
+      <div class="hero-content">
+        <h2>Prediction Accuracy</h2>
+        <div class="hero-value">{{ (bestMetrics.accuracy * 100).toFixed(0) }}%</div>
+        <p class="hero-subtitle">{{ getAccuracyMessage(bestMetrics.accuracy) }}</p>
+      </div>
+      <div class="hero-gauge">
+        <svg viewBox="0 0 120 120" class="gauge-svg">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="10"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="white" stroke-width="10"
+                  [attr.stroke-dasharray]="getGaugeDash(bestMetrics.accuracy)"
+                  stroke-dashoffset="0" stroke-linecap="round"
+                  transform="rotate(-90 60 60)"/>
+        </svg>
+      </div>
     </div>
 
-    <div class="model-metrics">
-      <h2>Model Performance Metrics</h2>
-      <div class="metrics-grid">
-        <div class="metric">
-          <span class="label">F1 Score</span>
-          <span class="value">{{ (classificationModels[selectedModel]?.f1 || 0).toFixed(4) }}</span>
+    <!-- Simple Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-icon">✅</span>
+        <span class="stat-value">{{ (bestMetrics.precision * 100).toFixed(0) }}%</span>
+        <span class="stat-label">When it predicts a level, it's correct this often</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🔍</span>
+        <span class="stat-value">{{ (bestMetrics.recall * 100).toFixed(0) }}%</span>
+        <span class="stat-label">Of all real cases, it catches this many</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">⭐</span>
+        <span class="stat-value">{{ (bestMetrics.auc * 100).toFixed(0) }}%</span>
+        <span class="stat-label">Overall confidence in the results</span>
+      </div>
+    </div>
+
+    <!-- What This Means -->
+    <div class="insight-card">
+      <h2>💡 What Does This Mean?</h2>
+      <div class="insight-content">
+        <div class="insight-item">
+          <span class="insight-bullet good">●</span>
+          <p>The system can correctly identify the participation level of a scout <strong>{{ (bestMetrics.accuracy * 100).toFixed(0) }}%</strong> of the time.</p>
         </div>
-        <div class="metric">
-          <span class="label">Accuracy</span>
-          <span class="value">{{ (classificationModels[selectedModel]?.accuracy || 0).toFixed(4) }}</span>
+        <div class="insight-item">
+          <span class="insight-bullet">●</span>
+          <p>This means for every <strong>10 scouts</strong>, it will correctly predict the activity level of about <strong>{{ (bestMetrics.accuracy * 10).toFixed(0) }}</strong> of them.</p>
         </div>
-        <div class="metric">
-          <span class="label">Precision</span>
-          <span class="value">{{ (classificationModels[selectedModel]?.precision || 0).toFixed(4) }}</span>
-        </div>
-        <div class="metric">
-          <span class="label">Recall</span>
-          <span class="value">{{ (classificationModels[selectedModel]?.recall || 0).toFixed(4) }}</span>
-        </div>
-        <div class="metric">
-          <span class="label">AUC</span>
-          <span class="value">{{ (classificationModels[selectedModel]?.auc || 0).toFixed(4) }}</span>
+        <div class="insight-item">
+          <span class="insight-bullet">●</span>
+          <p>You can use these predictions to plan activities, allocate resources, and identify scouts who may need extra encouragement.</p>
         </div>
       </div>
     </div>
 
-    <div class="details" *ngIf="confusionMatrix">
-      <h2>Confusion Matrix</h2>
-      <div class="matrix-table">
-        <table>
-          <tbody>
-            <tr *ngFor="let row of confusionMatrix.confusion_matrix">
-              <td *ngFor="let cell of row" class="matrix-cell">{{ cell }}</td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- Category Breakdown -->
+    <div class="breakdown-card" *ngIf="classificationReport">
+      <h2>📊 Breakdown by Participation Level</h2>
+      <p class="section-hint">How well the system recognizes each participation category:</p>
+      <div class="level-bars">
+        <div *ngFor="let item of getSimpleReport()" class="level-bar-item">
+          <div class="level-info">
+            <span class="level-icon">{{ item.icon }}</span>
+            <span class="level-name">{{ item.name }}</span>
+            <span class="level-count">{{ item.count }} scouts</span>
+          </div>
+          <div class="level-bar">
+            <div class="level-fill" [style.width.%]="item.accuracy" [ngClass]="getBarClass(item.accuracy)"></div>
+          </div>
+          <span class="level-pct">{{ item.accuracy }}% accuracy</span>
+        </div>
       </div>
     </div>
 
-    <div class="details" *ngIf="classificationReport">
-      <h2>Classification Report</h2>
-      <div class="report-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Class</th>
-              <th>Precision</th>
-              <th>Recall</th>
-              <th>F1-Score</th>
-              <th>Support</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let key of classificationReport.report | keyvalue">
-              <td *ngIf="shouldShowRow(key.key)">
-                {{ key.key }}
-              </td>
-              <td *ngFor="let metric of getMetricsAsArray(key.value)" class="metric-cell">
-                {{ isNumber(metric.value) ? (metric.value | number: '1.2-4') : metric.value }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- Prediction Summary Visual -->
+    <div class="summary-card" *ngIf="confusionMatrix">
+      <h2>📋 Prediction Summary</h2>
+      <p class="section-hint">Out of all predictions made, here's how they turned out:</p>
+      <div class="donut-stats">
+        <div class="donut-item correct">
+          <span class="donut-value">{{ getCorrectCount() }}</span>
+          <span class="donut-label">Correct Predictions ✅</span>
+        </div>
+        <div class="donut-item incorrect">
+          <span class="donut-value">{{ getIncorrectCount() }}</span>
+          <span class="donut-label">Incorrect Predictions ❌</span>
+        </div>
+        <div class="donut-item total">
+          <span class="donut-value">{{ getTotalCount() }}</span>
+          <span class="donut-label">Total Predictions</span>
+        </div>
       </div>
+      <div class="success-bar">
+        <div class="success-fill" [style.width.%]="getSuccessRate()"></div>
+      </div>
+      <p class="success-text">{{ getSuccessRate().toFixed(0) }}% of all predictions were correct</p>
     </div>
+
   </div>
-
-  <button (click)="loadClassificationModels()" class="refresh-btn">🔄 Refresh</button>
 </div>

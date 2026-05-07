@@ -1,8 +1,8 @@
 <div class="overview-container">
-  <h1>📊 ML Dashboard Overview</h1>
+  <h1>📊 Association Overview</h1>
 
   <div *ngIf="loading" class="loading">
-    <p>Loading dataset statistics...</p>
+    <p>Loading association statistics...</p>
   </div>
 
   <div *ngIf="error" class="error-message">
@@ -11,58 +11,58 @@
 
   <div *ngIf="datasetStats && !loading" class="stats-grid">
     <div class="stat-card">
-      <div class="stat-label">Total Records</div>
+      <div class="stat-label">Total Entries</div>
       <div class="stat-value">{{ datasetStats.total_records | number }}</div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-label">Total Columns</div>
+      <div class="stat-label">Information Fields</div>
       <div class="stat-value">{{ datasetStats.total_columns }}</div>
     </div>
 
     <div class="stat-card" *ngIf="datasetStats.date_range.start">
-      <div class="stat-label">Date Range</div>
+      <div class="stat-label">Reporting Period</div>
       <div class="stat-value">{{ datasetStats.date_range.start | slice:0:10 }} to {{ datasetStats.date_range.end | slice:0:10 }}</div>
     </div>
 
     <div class="stat-card" *ngIf="modelsInfo">
-      <div class="stat-label">Classification Models</div>
+      <div class="stat-label">Active Indicators</div>
       <div class="stat-value">{{ (modelsInfo.classification | keyvalue).length }}</div>
     </div>
 
     <div class="stat-card" *ngIf="modelsInfo">
-      <div class="stat-label">Regression Models</div>
+      <div class="stat-label">Trend Indicators</div>
       <div class="stat-value">{{ (modelsInfo.regression | keyvalue).length }}</div>
     </div>
   </div>
 
   <div *ngIf="modelsInfo && !loading" class="models-section">
-    <h2>Classification Models Performance</h2>
+    <h2>Participation Indicators</h2>
     <div class="metrics-grid">
       <div *ngFor="let item of modelsInfo.classification | keyvalue" class="metric-card">
         <div class="metric-title">{{ item.key }}</div>
         <div class="metric-details">
-          <p>F1 Score: {{ getFormatted(item.value, 'f1') }}</p>
-          <p>Accuracy: {{ getFormatted(item.value, 'accuracy') }}</p>
+          <p>Reliability (F1): {{ getFormatted(item.value, 'f1') }}</p>
+          <p>Correctness: {{ getFormatted(item.value, 'accuracy') }}</p>
           <p>Precision: {{ getFormatted(item.value, 'precision') }}</p>
-          <p>Recall: {{ getFormatted(item.value, 'recall') }}</p>
+          <p>Coverage: {{ getFormatted(item.value, 'recall') }}</p>
         </div>
       </div>
     </div>
 
-    <h2>Regression Models Performance</h2>
+    <h2>Trend Indicators</h2>
     <div class="metrics-grid">
       <div *ngFor="let item of modelsInfo.regression | keyvalue" class="metric-card">
         <div class="metric-title">{{ item.key }}</div>
         <div class="metric-details">
-          <p>R² Score: {{ getFormatted(item.value, 'r2') }}</p>
-          <p>RMSE: {{ getFormatted(item.value, 'rmse') }}</p>
-          <p>MAE: {{ getFormatted(item.value, 'mae') }}</p>
-          <p>MSE: {{ getFormatted(item.value, 'mse') }}</p>
+          <p>Fit Quality (R2): {{ getFormatted(item.value, 'r2') }}</p>
+          <p>Typical Error (RMSE): {{ getFormatted(item.value, 'rmse') }}</p>
+          <p>Average Difference (MAE): {{ getFormatted(item.value, 'mae') }}</p>
+          <p>Overall Difference (MSE): {{ getFormatted(item.value, 'mse') }}</p>
         </div>
       </div>
     </div>
   </div>
 
-  <button (click)="loadData()" class="refresh-btn">🔄 Refresh</button>
+  <button (click)="loadData()" class="refresh-btn">🔄 Update</button>
 </div>

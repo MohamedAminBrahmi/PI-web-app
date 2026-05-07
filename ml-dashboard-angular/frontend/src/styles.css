@@ -1,17 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Tunisian Scout-inspired palette */
+:root {
+  --olive-900: #4E4A1F;
+  --olive-800: #5A5626;
+  --olive-700: #6B6A2E;
+  --olive-600: #7A7A3D;
+  --olive-500: #8A8750;
+  --accent-600: #E85A27;
+  --accent-500: #FF6B35;
+  --accent-300: #FF9A6B;
+  --sand-50: #F7F2E8;
+  --sand-100: #F3E9D7;
+  --sand-200: #E5D7BE;
+  --ink-900: #1F1F1B;
+  --ink-700: #3B3B2E;
+  --border-color: #D8C7AB;
+  --shadow-soft: 0 12px 30px rgba(28, 26, 12, 0.12);
+  --shadow-strong: 0 22px 50px rgba(28, 26, 12, 0.2);
+}
+
 html, body {
   height: 100%;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f5f5f5;
-  color: #333;
+  font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+  color: var(--ink-900);
+  background: linear-gradient(180deg, rgba(243, 233, 215, 0.85) 0%, rgba(247, 242, 232, 0.95) 40%, #FDFBF6 100%);
 }
 
 body {
   margin: 0;
   padding: 0;
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(122, 122, 61, 0.18) 0%, rgba(122, 122, 61, 0) 40%),
+    radial-gradient(circle at 90% 20%, rgba(255, 107, 53, 0.12) 0%, rgba(255, 107, 53, 0) 45%);
+  background-attachment: fixed;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Marcellus', 'Georgia', serif;
+  color: var(--olive-900);
+  letter-spacing: 0.2px;
+}
+
+/* Global button styling */
+button, .btn {
+  background: var(--accent-500);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+button:hover, .btn:hover {
+  background: var(--accent-600);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(255, 107, 53, 0.28);
+}
+
+/* Global link styling */
+a {
+  color: var(--olive-700);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+a:hover {
+  color: var(--accent-500);
+}
+
+/* Google Translate widget polish */
+.goog-te-gadget {
+  font-family: 'Source Sans 3', 'Segoe UI', sans-serif !important;
+  color: white !important;
+}
+
+.goog-te-combo {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-radius: 6px !important;
+  padding: 6px 8px !important;
+  font-weight: 600 !important;
+}
+
+.goog-te-combo option {
+  color: var(--ink-900);
 }

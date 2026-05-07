@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
+import { HomeComponent } from './components/home.component';
 import { OverviewComponent } from './components/overview.component';
 import { ClassificationComponent } from './components/classification.component';
 import { RegressionComponent } from './components/regression.component';
@@ -15,6 +16,7 @@ import { PredictionComponent } from './components/prediction.component';
 @NgModule({
   declarations: [
     AppComponent,
+    HomeComponent,
     OverviewComponent,
     ClassificationComponent,
     RegressionComponent,

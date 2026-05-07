@@ -1,62 +1,99 @@
 <div class="clustering-container">
-  <h1>🔵 Clustering Analysis</h1>
+  <h1>🔵 Unit Grouping</h1>
+  <p class="page-description">
+    Scout units are automatically organized into <strong>similar groups</strong> based on their activity levels and participation.
+    This helps you compare similar units, share best practices, and target support where it's needed most.
+  </p>
 
   <div *ngIf="loading" class="loading">
-    <p>Loading clustering data...</p>
+    <div class="loading-spinner"></div>
+    <p>Organizing units into groups...</p>
   </div>
 
   <div *ngIf="error" class="error-message">
     <p>❌ {{ error }}</p>
+    <button (click)="loadClusteringData()" class="retry-btn">Try Again</button>
   </div>
 
-  <div *ngIf="silhouetteAnalysis && !loading" class="silhouette-section">
-    <h2>Silhouette Analysis</h2>
-    <div class="silhouette-stats">
-      <div class="stat-card">
-        <div class="stat-label">Best K</div>
-        <div class="stat-value">{{ silhouetteAnalysis.best_k }}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Best Score</div>
-        <div class="stat-value">{{ silhouetteAnalysis.best_score.toFixed(4) }}</div>
+  <div *ngIf="silhouetteAnalysis && !loading && !error" class="content">
+
+    <!-- Hero Card -->
+    <div class="hero-card">
+      <div class="hero-icon">🏕️</div>
+      <div class="hero-content">
+        <h2>Grouping Result</h2>
+        <div class="hero-value">{{ silhouetteAnalysis.best_k }} Groups</div>
+        <p class="hero-subtitle">Units naturally fall into {{ silhouetteAnalysis.best_k }} distinct groups with <strong>{{ (silhouetteAnalysis.best_score * 100).toFixed(0) }}%</strong> separation quality. {{ getGroupQualityMessage(silhouetteAnalysis.best_score) }}</p>
       </div>
     </div>
-    
-    <div class="scores-grid">
-      <div *ngFor="let item of silhouetteAnalysis.silhouette_scores | keyvalue" class="score-item">
-        <span class="k-value">K={{ item.key }}</span>
-        <div class="score-bar">
-          <div class="score-fill" [style.width.%]="getScoreWidth(item.value)"></div>
+
+    <!-- Group Profiles -->
+    <div *ngIf="clustersSummary" class="groups-section">
+      <h2>👥 Group Profiles</h2>
+      <p class="section-hint">Each group represents units with similar characteristics. Here's what makes each group unique:</p>
+
+      <div class="groups-grid">
+        <div *ngFor="let item of clustersSummary.clusters | keyvalue; let i = index" class="group-card" [ngClass]="'group-color-' + i">
+          <div class="group-header">
+            <span class="group-emoji">{{ getGroupEmoji(i) }}</span>
+            <div>
+              <h3>Group {{ i + 1 }}</h3>
+              <span class="group-type">{{ getGroupType(item.value) }}</span>
+            </div>
+          </div>
+
+          <div class="group-body">
+            <div class="group-stat">
+              <div class="group-stat-icon">👥</div>
+              <div>
+                <span class="group-stat-number">{{ getClusterSize(item.value) }}</span>
+                <span class="group-stat-text">units in this group</span>
+              </div>
+            </div>
+
+            <div class="group-stat">
+              <div class="group-stat-icon">📋</div>
+              <div>
+                <span class="group-stat-number">{{ getClusterAvgEvents(item.value) }}</span>
+                <span class="group-stat-text">activities per unit (average)</span>
+              </div>
+            </div>
+
+            <div class="group-stat">
+              <div class="group-stat-icon">🏕️</div>
+              <div>
+                <span class="group-stat-number">{{ getClusterAvgParticipants(item.value) }}</span>
+                <span class="group-stat-text">participants per activity (average)</span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="getClusterUnits(item.value)" class="group-footer">
+            <span class="group-units-label">Sample units:</span>
+            <span class="group-units">{{ getClusterUnits(item.value) }}</span>
+          </div>
         </div>
-        <span class="score-value">{{ getScoreValue(item.value) }}</span>
       </div>
     </div>
-  </div>
 
-  <div *ngIf="clustersSummary && !loading" class="clusters-section">
-    <h2>Clusters Summary</h2>
-    <div class="clusters-grid">
-      <div *ngFor="let item of clustersSummary.clusters | keyvalue" class="cluster-card">
-        <div class="cluster-header">{{ item.key }}</div>
-        <div class="cluster-details">
-          <p><strong>Size:</strong> {{ getClusterSize(item.value) }} units</p>
-          <p><strong>Avg Events:</strong> {{ getClusterAvgEvents(item.value) }}</p>
-          <p><strong>Avg Participants:</strong> {{ getClusterAvgParticipants(item.value) }}</p>
-          <p *ngIf="getClusterUnits(item.value)" class="units-list"><strong>Units:</strong> {{ getClusterUnits(item.value) }}</p>
+    <!-- What This Means -->
+    <div class="insight-card">
+      <h2>💡 How to Use This</h2>
+      <div class="insight-content">
+        <div class="insight-item">
+          <span class="insight-bullet">🔄</span>
+          <p><strong>Compare Similar Units:</strong> Units in the same group face similar challenges — share strategies between them.</p>
+        </div>
+        <div class="insight-item">
+          <span class="insight-bullet">🎯</span>
+          <p><strong>Target Support:</strong> Groups with lower activity may need more encouragement, resources, or leader training.</p>
+        </div>
+        <div class="insight-item">
+          <span class="insight-bullet">📊</span>
+          <p><strong>Set Realistic Goals:</strong> Compare a unit's performance to others in its group rather than the entire organization.</p>
         </div>
       </div>
     </div>
-  </div>
 
-  <div *ngIf="pcaVisualization && !loading" class="pca-section">
-    <h2>PCA Visualization Data</h2>
-    <p class="info">PCA coordinates (2D projection) loaded. Use a charting library to visualize:</p>
-    <div class="pca-info">
-      <p><strong>Data Points:</strong> {{ pcaVisualization.pca.x.length }}</p>
-      <p><strong>Clusters:</strong> {{ pcaVisualization.clusters.length }}</p>
-      <p><strong>Features:</strong> {{ pcaVisualization.features.join(', ') }}</p>
-    </div>
   </div>
-
-  <button (click)="loadClusteringData()" class="refresh-btn">🔄 Refresh</button>
 </div>

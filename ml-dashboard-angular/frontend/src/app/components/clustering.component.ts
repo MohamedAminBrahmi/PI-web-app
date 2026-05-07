@@ -29,30 +29,40 @@ export class ClusteringComponent implements OnInit {
     this.dataService.setLoading(true);
 
     Promise.all([
-      this.apiService.getPCAVisualization().toPromise(),
       this.apiService.getSilhouetteAnalysis().toPromise(),
       this.apiService.getClustersSummary().toPromise()
-    ]).then(([pca, sil, summary]: any) => {
-      this.pcaVisualization = pca;
+    ]).then(([sil, summary]: any) => {
       this.silhouetteAnalysis = sil;
       this.clustersSummary = summary;
       this.loading = false;
       this.dataService.setLoading(false);
     }).catch((err: any) => {
-      this.error = 'Failed to load clustering data';
+      this.error = 'Unable to load grouping data. Please check your connection and try again.';
       this.dataService.setError(this.error);
       this.loading = false;
       this.dataService.setLoading(false);
     });
   }
 
-  getScoreWidth(value: any): number {
-    const numValue = Number(value);
-    return (numValue + 1) * 50;
+  getGroupQualityMessage(score: number): string {
+    if (score >= 0.7) return 'The groups are very clearly defined.';
+    if (score >= 0.5) return 'The groups are well separated.';
+    if (score >= 0.3) return 'The groups have some overlap but are still useful.';
+    return 'Groups provide general guidance.';
   }
 
-  getScoreValue(value: any): string {
-    return Number(value).toFixed(4);
+  getGroupEmoji(index: number): string {
+    const emojis = ['🟢', '🔵', '🟠', '🟣', '🔴', '🟡'];
+    return emojis[index % emojis.length];
+  }
+
+  getGroupType(value: any): string {
+    const avgEvents = value?.avg_events || 0;
+    const avgParticipants = value?.avg_participants || 0;
+    if (avgEvents > 50 || avgParticipants > 100) return 'Very Active';
+    if (avgEvents > 20 || avgParticipants > 40) return 'Active';
+    if (avgEvents > 10 || avgParticipants > 20) return 'Moderately Active';
+    return 'Growing';
   }
 
   getClusterSize(value: any): number {
@@ -60,11 +70,11 @@ export class ClusteringComponent implements OnInit {
   }
 
   getClusterAvgEvents(value: any): string {
-    return value && value.avg_events ? Number(value.avg_events).toFixed(2) : '0.00';
+    return value && value.avg_events ? Number(value.avg_events).toFixed(1) : '0.0';
   }
 
   getClusterAvgParticipants(value: any): string {
-    return value && value.avg_participants ? Number(value.avg_participants).toFixed(2) : '0.00';
+    return value && value.avg_participants ? Number(value.avg_participants).toFixed(1) : '0.0';
   }
 
   getClusterUnits(value: any): string {

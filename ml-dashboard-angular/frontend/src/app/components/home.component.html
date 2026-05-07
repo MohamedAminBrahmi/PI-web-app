@@ -1,0 +1,81 @@
+<div class="home-shell">
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-eyebrow">Tunisian Scout Association · Activity Planning</span>
+      <h1>Plan your next activity with confidence</h1>
+      <p>Know how many scouts will attend, prepare the right resources, and make every event a success — powered by data from past activities.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" routerLink="/prediction">🏕️ Plan an Activity</a>
+        <a class="btn btn-secondary" routerLink="/forecasting">📈 See Future Trends</a>
+      </div>
+      <div class="hero-highlights">
+        <div class="highlight-card" *ngFor="let highlight of heroHighlights">
+          <span class="highlight-icon">{{ highlight.icon }}</span>
+          <div>
+            <span class="highlight-value">{{ highlight.value }}</span>
+            <span class="highlight-label">{{ highlight.label }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-section">
+    <div class="section-header">
+      <h2>How Does It Work?</h2>
+      <p>Three simple steps to plan any scout activity.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-card" *ngFor="let step of howItWorks">
+        <div class="how-step">{{ step.step }}</div>
+        <span class="how-icon">{{ step.icon }}</span>
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.description }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="actions-section">
+    <div class="section-header">
+      <h2>Explore the Dashboard</h2>
+      <p>Everything you need to understand and plan scout activities.</p>
+    </div>
+    <div class="actions-grid">
+      <a class="action-card" *ngFor="let action of quickActions" [routerLink]="action.route" [attr.data-accent]="action.accent">
+        <span class="action-icon">{{ action.icon }}</span>
+        <div class="action-content">
+          <h3>{{ action.title }}</h3>
+          <p>{{ action.description }}</p>
+        </div>
+        <span class="action-arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="testimonials-section">
+    <div class="section-header">
+      <h2>What Scout Leaders Say</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card" *ngFor="let t of testimonials">
+        <div class="testimonial-quote">"{{ t.quote }}"</div>
+        <div class="testimonial-author">
+          <strong>{{ t.author }}</strong>
+          <span>{{ t.role }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-card">
+      <h2>Ready to plan your next event?</h2>
+      <p>Enter your activity details and get an instant participant estimate.</p>
+      <div class="cta-actions">
+        <a class="btn btn-primary" routerLink="/prediction">Start Planning Now</a>
+        <a class="btn btn-secondary" routerLink="/overview">View All Data</a>
+      </div>
+    </div>
+  </section>
+</div>

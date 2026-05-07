@@ -1,88 +1,98 @@
 <div class="regression-container">
-  <h1>📈 Regression Models</h1>
+  <h1>📈 Estimation Insights</h1>
+  <p class="page-description">
+    Our system estimates <strong>participation numbers</strong> for upcoming scout activities. 
+    See how close these estimates are to reality — so you can plan with confidence.
+  </p>
 
   <div *ngIf="loading" class="loading">
-    <p>Loading regression models...</p>
+    <div class="loading-spinner"></div>
+    <p>Analyzing estimation data...</p>
   </div>
 
   <div *ngIf="error" class="error-message">
     <p>❌ {{ error }}</p>
+    <button (click)="loadRegressionModels()" class="retry-btn">Try Again</button>
   </div>
 
-  <div *ngIf="regressionModels && !loading" class="section">
-    <div class="model-selector">
-      <label for="model-select">Select Model:</label>
-      <select [(ngModel)]="selectedModel" (change)="onModelChange()" id="model-select">
-        <option *ngFor="let model of regressionModels | keyvalue" [value]="model.key">
-          {{ model.key }}
-        </option>
-      </select>
+  <div *ngIf="bestModel && !loading && !error" class="content">
+
+    <!-- Main Accuracy Card -->
+    <div class="hero-card" [ngClass]="getR2Level(bestMetrics.r2)">
+      <div class="hero-icon">{{ getR2Emoji(bestMetrics.r2) }}</div>
+      <div class="hero-content">
+        <h2>Estimation Accuracy</h2>
+        <div class="hero-value">{{ (bestMetrics.r2 * 100).toFixed(0) }}%</div>
+        <p class="hero-subtitle">{{ getR2Message(bestMetrics.r2) }}</p>
+      </div>
+      <div class="hero-gauge">
+        <svg viewBox="0 0 120 120" class="gauge-svg">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="10"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="white" stroke-width="10"
+                  [attr.stroke-dasharray]="getGaugeDash(bestMetrics.r2)"
+                  stroke-dashoffset="0" stroke-linecap="round"
+                  transform="rotate(-90 60 60)"/>
+        </svg>
+      </div>
     </div>
 
-    <div class="model-metrics">
-      <h2>Model Performance</h2>
-      <div class="metrics-grid">
-        <div class="metric">
-          <span class="label">R² Score</span>
-          <span class="value">{{ (regressionModels[selectedModel]?.r2 || 0).toFixed(4) }}</span>
+    <!-- Simple Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-icon">📏</span>
+        <span class="stat-value">± {{ bestMetrics.mae.toFixed(1) }}</span>
+        <span class="stat-label">On average, estimates differ from reality by this much</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">📐</span>
+        <span class="stat-value">± {{ bestMetrics.rmse.toFixed(1) }}</span>
+        <span class="stat-label">Most estimates fall within this range of the real number</span>
+      </div>
+    </div>
+
+    <!-- What This Means -->
+    <div class="insight-card">
+      <h2>💡 What Does This Mean?</h2>
+      <div class="insight-content">
+        <div class="insight-item">
+          <span class="insight-bullet good">●</span>
+          <p>The system captures <strong>{{ (bestMetrics.r2 * 100).toFixed(0) }}%</strong> of the real patterns in your participation data.</p>
         </div>
-        <div class="metric">
-          <span class="label">RMSE</span>
-          <span class="value">{{ (regressionModels[selectedModel]?.rmse || 0).toFixed(4) }}</span>
+        <div class="insight-item">
+          <span class="insight-bullet">●</span>
+          <p>When estimating attendance, expect the real number to be within <strong>± {{ bestMetrics.mae.toFixed(0) }} participants</strong> of the estimate.</p>
         </div>
-        <div class="metric">
-          <span class="label">MAE</span>
-          <span class="value">{{ (regressionModels[selectedModel]?.mae || 0).toFixed(4) }}</span>
-        </div>
-        <div class="metric">
-          <span class="label">MSE</span>
-          <span class="value">{{ (regressionModels[selectedModel]?.mse || 0).toFixed(4) }}</span>
+        <div class="insight-item">
+          <span class="insight-bullet">●</span>
+          <p>Use these estimates for <strong>resource planning</strong> — how many supplies, transport seats, or meals to prepare.</p>
         </div>
       </div>
     </div>
 
-    <div class="details" *ngIf="regressionData">
-      <h2>Actual vs Predicted (First 20 samples)</h2>
-      <div class="data-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Sample</th>
-              <th>Actual</th>
-              <th>Predicted</th>
-              <th>Error</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let i of regressionData.actual.slice(0, 20); let idx = index">
-              <td>{{ idx + 1 }}</td>
-              <td>{{ regressionData.actual[idx].toFixed(2) }}</td>
-              <td>{{ regressionData.predicted[idx].toFixed(2) }}</td>
-              <td>{{ (regressionData.actual[idx] - regressionData.predicted[idx]).toFixed(2) }}</td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- Comparison Table -->
+    <div class="comparison-card" *ngIf="regressionData">
+      <h2>📊 Real vs Estimated (Recent Examples)</h2>
+      <p class="section-hint">See how close our estimates were to what actually happened:</p>
+      <div class="comparison-list">
+        <div *ngFor="let item of getComparisonItems()" class="comparison-item" [ngClass]="item.class">
+          <div class="comp-number">#{{ item.index }}</div>
+          <div class="comp-details">
+            <div class="comp-row">
+              <span class="comp-label">Actual:</span>
+              <span class="comp-actual">{{ item.actual }}</span>
+            </div>
+            <div class="comp-row">
+              <span class="comp-label">Estimated:</span>
+              <span class="comp-predicted">{{ item.predicted }}</span>
+            </div>
+          </div>
+          <div class="comp-result">
+            <span class="comp-accuracy">{{ item.accuracy }}</span>
+            <span class="comp-accuracy-label">accuracy</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="details" *ngIf="residuals">
-      <h2>Residuals Analysis</h2>
-      <div class="residual-stats">
-        <div class="stat">
-          <span class="label">Mean Residual</span>
-          <span class="value">{{ residuals.mean.toFixed(4) }}</span>
-        </div>
-        <div class="stat">
-          <span class="label">Std Residual</span>
-          <span class="value">{{ residuals.std.toFixed(4) }}</span>
-        </div>
-        <div class="stat">
-          <span class="label">Total Samples</span>
-          <span class="value">{{ residuals.count }}</span>
-        </div>
-      </div>
-    </div>
   </div>
-
-  <button (click)="loadRegressionModels()" class="refresh-btn">🔄 Refresh</button>
 </div>

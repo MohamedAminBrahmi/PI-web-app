@@ -1,34 +1,30 @@
-# Frontend Dockerfile
-FROM node:18-alpine as builder
+# ── Frontend Dockerfile ──
+# Stage 1: Build Angular app
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first for better layer caching
 COPY frontend/package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy application code
-COPY frontend .
+COPY frontend/ .
 
-# Build Angular app
-RUN npm run build
+# Build Angular app for production
+RUN npx ng build --configuration production
 
-# Production stage
-FROM node:18-alpine
+# ── Stage 2: Serve with Nginx ──
+FROM nginx:alpine
 
-# Install live-server for development or nginx for production
-# For development, we'll use a simple HTTP server
-RUN npm install -g http-server
+# Copy custom nginx config for SPA routing
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-WORKDIR /app
+# Copy built Angular app from builder
+COPY --from=builder /app/dist/ml-dashboard /usr/share/nginx/html
 
-# Copy built app from builder
-COPY --from=builder /app/dist/ml-dashboard ./dist
-
-# Expose port
 EXPOSE 4200
 
-# Serve Angular app
-CMD ["http-server", "dist", "-p", "4200", "--cors"]
+CMD ["nginx", "-g", "daemon off;"]

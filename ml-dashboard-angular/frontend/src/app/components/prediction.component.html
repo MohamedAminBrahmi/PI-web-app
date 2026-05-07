@@ -1,66 +1,113 @@
 <div class="prediction-container">
   <div class="prediction-header">
-    <h1>🔮 Model Prediction</h1>
-    <p>Test your trained models with custom inputs</p>
+    <h1>📊 Activity Planner</h1>
+    <p>Enter your activity details and get an estimate of how many scouts will participate.</p>
   </div>
 
   <div class="prediction-card">
-    <!-- Model Selection -->
+    <!-- Activity Details Form -->
     <div class="form-section">
-      <h2>1. Select Model</h2>
-      
-      <div class="form-group">
-        <label>Model Type:</label>
-        <select [(ngModel)]="selectedModelType" (change)="onModelTypeChange()" class="form-control">
-          <option value="classification">Classification</option>
-          <option value="regression">Regression</option>
-          <option value="clustering">Clustering</option>
-          <option value="forecasting">Forecasting</option>
-        </select>
-      </div>
+      <h2>🏕️ Tell Us About Your Activity</h2>
+      <p class="form-hint">Fill in the details below — we'll estimate how many scouts are likely to attend.</p>
 
-      <div class="form-group">
-        <label>Select Model:</label>
-        <select [(ngModel)]="selectedModel" class="form-control">
-          <option *ngFor="let model of getModelList()" [value]="model">
-            {{ model }}
-          </option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Feature Input -->
-    <div class="form-section">
-      <h2>2. Input Features</h2>
-      
       <div class="features-grid">
-        <div class="feature-input" *ngFor="let key of featureKeys; let i = index">
-          <label>{{ featureLabels[i] }}:</label>
-          <input 
-            type="number" 
-            [(ngModel)]="features[key]" 
+        <!-- Activity Type -->
+        <div class="feature-input">
+          <label>
+            <span class="feature-icon">🏕️</span>
+            Activity Type
+          </label>
+          <select [(ngModel)]="activityType" class="form-control">
+            <option *ngFor="let type of activityTypes" [ngValue]="type.value">
+              {{ type.label }}
+            </option>
+          </select>
+          <span class="feature-help">What kind of activity are you planning?</span>
+        </div>
+
+        <!-- Duration -->
+        <div class="feature-input">
+          <label>
+            <span class="feature-icon">📅</span>
+            Duration (days)
+          </label>
+          <input
+            type="number"
+            [(ngModel)]="duration"
             class="form-control"
-            [step]="i === 4 ? '1' : '0.1'"
+            min="1"
+            max="30"
+            step="1"
+            placeholder="e.g. 3"
           >
+          <span class="feature-help">How many days will the activity last?</span>
+        </div>
+
+        <!-- Budget -->
+        <div class="feature-input">
+          <label>
+            <span class="feature-icon">💰</span>
+            Budget per Person (TND)
+          </label>
+          <input
+            type="number"
+            [(ngModel)]="budgetPerPerson"
+            class="form-control"
+            min="0"
+            max="1000"
+            step="5"
+            placeholder="e.g. 50"
+          >
+          <span class="feature-help">Estimated cost per participant in Tunisian Dinar.</span>
+        </div>
+
+        <!-- Season -->
+        <div class="feature-input">
+          <label>
+            <span class="feature-icon">🌤️</span>
+            Season
+          </label>
+          <select [(ngModel)]="season" class="form-control">
+            <option *ngFor="let s of seasons" [ngValue]="s.value">
+              {{ s.label }}
+            </option>
+          </select>
+          <span class="feature-help">When is the activity planned?</span>
+        </div>
+
+        <!-- Age Group -->
+        <div class="feature-input">
+          <label>
+            <span class="feature-icon">👥</span>
+            Target Age Group
+          </label>
+          <select [(ngModel)]="ageGroup" class="form-control">
+            <option *ngFor="let ag of ageGroups" [ngValue]="ag.value">
+              {{ ag.label }}
+            </option>
+          </select>
+          <span class="feature-help">Which age group is the activity for?</span>
         </div>
       </div>
     </div>
 
     <!-- Actions -->
-    <div class="form-section">
-      <div class="button-group">
-        <button 
-          (click)="makePrediction()" 
-          [disabled]="loading" 
-          class="btn btn-primary"
-        >
-          <span *ngIf="!loading">🚀 Make Prediction</span>
-          <span *ngIf="loading">⏳ Processing...</span>
-        </button>
-        <button (click)="resetForm()" class="btn btn-secondary">
-          🔄 Reset Form
-        </button>
-      </div>
+    <div class="form-actions">
+      <button
+        (click)="estimateParticipants()"
+        [disabled]="loading"
+        class="btn btn-primary"
+        id="estimate-btn"
+      >
+        <span *ngIf="!loading">🚀 Estimate Participants</span>
+        <span *ngIf="loading" class="loading-text">
+          <span class="spinner"></span>
+          Calculating...
+        </span>
+      </button>
+      <button (click)="resetForm()" class="btn btn-secondary" id="reset-btn">
+        🔄 Start Over
+      </button>
     </div>
 
     <!-- Error Message -->
@@ -68,49 +115,48 @@
       ⚠️ {{ error }}
     </div>
 
-    <!-- Prediction Result -->
-    <div *ngIf="prediction" class="result-section">
-      <h2>Prediction Result</h2>
-      
-      <div class="result-card">
-        <div class="result-item">
-          <label>Model:</label>
-          <span class="value">{{ prediction.model_name }}</span>
+    <!-- Result -->
+    <div *ngIf="prediction" class="result-section" id="result-section">
+      <div class="result-hero">
+        <div class="result-emoji">🎯</div>
+        <div class="result-main">
+          <span class="result-label">Estimated Participants</span>
+          <span class="result-number">~{{ estimatedParticipants }}</span>
+          <span class="result-unit">scouts</span>
         </div>
-        
-        <div class="result-item">
-          <label>Type:</label>
-          <span class="value">{{ prediction.model_type | titlecase }}</span>
-        </div>
-        
-        <div class="result-item">
-          <label>Prediction:</label>
-          <span class="value prediction-value">
-            {{ prediction.prediction }}
-          </span>
-        </div>
-        
-        <div *ngIf="prediction.confidence" class="result-item">
-          <label>Confidence:</label>
-          <div class="confidence-bar">
-            <div 
-              class="confidence-fill" 
-              [style.width.%]="prediction.confidence * 100"
-            ></div>
-            <span class="confidence-text">{{ (prediction.confidence * 100).toFixed(2) }}%</span>
+      </div>
+
+      <div class="result-details">
+        <div class="detail-card">
+          <span class="detail-icon">📋</span>
+          <div>
+            <strong>Your Activity</strong>
+            <p>{{ getActivityLabel() }} · {{ duration }} day{{ duration > 1 ? 's' : '' }} · {{ getSeasonLabel() }}</p>
           </div>
         </div>
-        
-        <div *ngIf="prediction.model_info" class="result-item">
-          <label>Model Info:</label>
-          <div class="model-info">
-            <span *ngFor="let key of ['accuracy', 'f1', 'rmse', 'r2', 'n_clusters'] | keyvalue">
-              <span *ngIf="prediction.model_info[key.key] !== undefined">
-                <strong>{{ key.key }}:</strong> {{ prediction.model_info[key.key] | number: '1.4-4' }}<br>
-              </span>
-            </span>
+        <div class="detail-card">
+          <span class="detail-icon">💰</span>
+          <div>
+            <strong>Budget</strong>
+            <p>{{ budgetPerPerson }} TND per person · {{ getAgeGroupLabel() }}</p>
           </div>
         </div>
+        <div class="detail-card highlight">
+          <span class="detail-icon">📦</span>
+          <div>
+            <strong>Recommended Preparation</strong>
+            <p>Prepare supplies for <strong>{{ safetyBuffer }} scouts</strong> (+10% safety buffer) to avoid shortages.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-tips">
+        <h3>💡 Planning Tips</h3>
+        <ul>
+          <li>Book transport for <strong>{{ safetyBuffer }}</strong> seats to be safe.</li>
+          <li>Prepare <strong>{{ safetyBuffer }}</strong> meals/snack packs.</li>
+          <li>Ensure at least <strong>{{ Math.ceil(estimatedParticipants / 8) }}</strong> group leaders are available (1 per 8 scouts).</li>
+        </ul>
       </div>
     </div>
   </div>
